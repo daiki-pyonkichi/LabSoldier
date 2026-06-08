@@ -1,0 +1,21 @@
+[Unit]
+Description=LabSoldier backend (Express + SQLite)
+After=network.target
+
+[Service]
+Type=simple
+# コードの配置先（rsync/clone先）
+WorkingDirectory=/opt/labsoldier/backend
+# Node のフルパスは `which node` で確認して合わせる
+ExecStart=/usr/bin/node dist/index.js
+Restart=always
+RestartSec=3
+# rsync(ubuntu)と同じユーザーで動かすと再デプロイ時の権限衝突が無い
+User=ubuntu
+Group=ubuntu
+# 環境変数(JWT_SECRET / LAB_ALLOWED_IPS / DB_PATH 等)は永続ディレクトリに置く。
+# ★ /opt/labsoldier-data は rsync 対象(/opt/labsoldier)の外。--delete で消えないようにするため。
+EnvironmentFile=/opt/labsoldier-data/labsoldier.env
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+*/node_modules/
+
+# build outputs
+dist/
+build/
+*/dist/
+*/build/
+
+# env
+.env
+.env.local
+*.env
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# editor / OS
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# TypeScript
+*.tsbuildinfo
+
+# avatar GIF backup (local safety copy, not served)
+frontend/.avatars-backup/
+
+# SQLite (if使うなら)
+*.sqlite
+*.db
+*.db-shm
+*.db-wal
+backend/data/

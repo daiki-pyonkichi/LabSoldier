@@ -1,0 +1,11 @@
+# Caddy 設定: HTTPS 終端 + Node(3001) へリバースプロキシ
+# YOUR_IP を VM の公開IPに置き換える（例: 140.83.12.34.sslip.io）。
+# sslip.io は <IP>.sslip.io が自動でそのIPに解決される無料DNS。ドメイン購入不要で
+# Let's Encrypt の証明書を自動取得できる。
+#
+# 設置先: /etc/caddy/Caddyfile  →  sudo systemctl reload caddy
+
+YOUR_IP.sslip.io {
+	encode gzip
+	reverse_proxy localhost:3001
+}

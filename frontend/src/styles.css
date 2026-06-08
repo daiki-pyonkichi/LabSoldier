@@ -1,0 +1,2167 @@
+:root {
+  --bg: #0a0d12;
+  --bg-2: #11161d;
+  --surface: #161c25;
+  --surface-2: #1d2530;
+  --border: #2a3340;
+  --border-strong: #3a4759;
+  --ink: #e6edf3;
+  --muted: #7d8a9c;
+  --muted-2: #545f6e;
+  --olive: #c2cf3a;
+  --olive-deep: #9aa72a;
+  --amber: #f0883e;
+  --crimson: #f85149;
+  --grid: rgba(194, 207, 58, 0.06);
+  --scan: rgba(194, 207, 58, 0.03);
+
+  font-family: "Noto Sans JP", "Inter", -apple-system, sans-serif;
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  /* 横方向のはみ出し（画面外スクロール）を防ぐ */
+  overflow-x: hidden;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(194, 207, 58, 0.08), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(240, 136, 62, 0.05), transparent 60%),
+    linear-gradient(180deg, #0a0d12 0%, #0d1218 100%);
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 85%);
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0 3px,
+    var(--scan) 3px 4px
+  );
+  mix-blend-mode: overlay;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+/* ============================================================
+   Typography
+   ============================================================ */
+
+.stencil {
+  font-family: "Big Shoulders Stencil Display", "Noto Sans JP", sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.02em;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tag::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--olive);
+  box-shadow: 0 0 8px var(--olive);
+}
+
+/* ============================================================
+   Header (ops bar)
+   ============================================================ */
+
+.ops-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+  border-bottom: 1px dashed var(--border);
+  /* boot アニメの transform で stacking context ができ、後続の .card に重なられる対策。
+     position+z-index で #root 内のレイヤーを明示的に引き上げる。 */
+  position: relative;
+  z-index: 20;
+}
+
+.ops-bar__title {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0;
+  font-family: "Big Shoulders Stencil Display", "Noto Sans JP", sans-serif;
+  font-weight: 900;
+  font-size: clamp(32px, 5vw, 52px);
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  color: var(--ink);
+}
+
+.ops-bar__title em {
+  font-style: normal;
+  color: var(--olive);
+}
+
+.ops-bar__sub {
+  margin: 6px 0 0;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ops-bar__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.ops-bar__user .who {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.ops-bar__user .who::before {
+  content: "OP·";
+  color: var(--olive);
+  margin-right: 6px;
+}
+
+/* ============================================================
+   Card / panel
+   ============================================================ */
+
+.card {
+  position: relative;
+  background:
+    linear-gradient(180deg, var(--surface) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--border);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid var(--olive);
+  border-left: 2px solid var(--olive);
+  pointer-events: none;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 18px;
+  height: 18px;
+  border-bottom: 2px solid var(--olive);
+  border-right: 2px solid var(--olive);
+  pointer-events: none;
+}
+
+.card__head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card__head h2 {
+  margin: 0;
+  font-family: "Big Shoulders Stencil Display", "Noto Sans JP", sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.card__head .spacer {
+  flex: 1;
+}
+
+.card__head .count {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.card__head .count strong {
+  color: var(--olive);
+  font-size: 18px;
+  margin-right: 2px;
+}
+
+/* ============================================================
+   Buttons & inputs
+   ============================================================ */
+
+button,
+.btn {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-2);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  background: var(--surface);
+  border-color: var(--olive-deep);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--olive);
+  color: #0a0d12;
+  border-color: var(--olive);
+  font-weight: 700;
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--olive-deep);
+  border-color: var(--olive-deep);
+}
+
+button.ghost {
+  background: transparent;
+}
+
+input[type="text"],
+input[type="password"] {
+  font: inherit;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  padding: 12px 14px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-2);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: var(--olive);
+  box-shadow: 0 0 0 3px rgba(194, 207, 58, 0.18);
+}
+
+input::placeholder {
+  color: var(--muted-2);
+}
+
+/* ============================================================
+   Login screen
+   ============================================================ */
+
+.terminal {
+  max-width: 440px;
+  margin: 64px auto 0;
+  padding: 32px;
+  background:
+    linear-gradient(180deg, var(--surface) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.terminal::before,
+.terminal::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+.terminal::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--olive);
+  border-left: 2px solid var(--olive);
+}
+
+.terminal::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--olive);
+  border-right: 2px solid var(--olive);
+}
+
+.terminal__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.terminal__brand .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--olive);
+  box-shadow: 0 0 8px var(--olive);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.terminal__title {
+  margin: 0 0 24px;
+  font-family: "Big Shoulders Stencil Display", "Noto Sans JP", sans-serif;
+  font-weight: 900;
+  font-size: 42px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.terminal__title em {
+  font-style: normal;
+  color: var(--olive);
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+}
+
+.auth-tabs button {
+  border: 0;
+  border-right: 1px solid var(--border);
+  padding: 12px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+}
+
+.auth-tabs button:last-child {
+  border-right: 0;
+}
+
+.auth-tabs button.active {
+  background: var(--olive);
+  color: #0a0d12;
+  font-weight: 700;
+}
+
+.auth-form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.field span::before {
+  content: "› ";
+  color: var(--olive);
+}
+
+.auth-form button.primary {
+  margin-top: 8px;
+  padding: 14px;
+  font-size: 13px;
+}
+
+/* アバター選択 */
+.avatar-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.avatar-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.avatar-option:hover {
+  border-color: var(--border-strong);
+}
+
+.avatar-option.active {
+  border-color: var(--olive);
+  background: rgba(194, 207, 58, 0.1);
+  box-shadow: 0 0 0 1px var(--olive) inset;
+}
+
+.avatar-option__face {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.avatar-option__gif {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.avatar-option__png {
+  width: 64px;
+  height: 88px;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+.avatar-option__label {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.avatar-option.active .avatar-option__label {
+  color: var(--olive);
+}
+
+/* 今後追加予定の枠（選択不可） */
+.avatar-option--soon {
+  cursor: not-allowed;
+  opacity: 0.4;
+  justify-content: center;
+}
+
+.avatar-option--soon:hover {
+  border-color: var(--border);
+}
+
+/* フォームの入力エラー（パスワード不一致など） */
+.field__error {
+  color: var(--crimson);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.auth-hint {
+  margin: 18px 0 0;
+  padding: 10px 12px;
+  background: var(--bg-2);
+  border-left: 2px solid var(--amber);
+  color: var(--muted);
+  font-size: 12px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.04em;
+}
+
+.auth-hint code {
+  color: var(--amber);
+  background: transparent;
+  padding: 0 2px;
+}
+
+.auth-error {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  background: rgba(248, 81, 73, 0.08);
+  border-left: 2px solid var(--crimson);
+  color: var(--crimson);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+}
+
+/* ============================================================
+   Character grid
+   ============================================================ */
+
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.character {
+  position: relative;
+  padding: 18px 8px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  text-align: center;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.character::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted-2);
+}
+
+.character.present::before {
+  background: var(--olive);
+  box-shadow: 0 0 8px var(--olive);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.character:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+}
+
+.character.absent {
+  opacity: 0.42;
+  filter: grayscale(70%);
+}
+
+.character .avatar {
+  font-size: 52px;
+  line-height: 1;
+  width: 96px;
+  height: 168px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* ズームではみ出した暗い縁を切り落とす */
+}
+
+.character .avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.15); /* 少し拡大して GIF の暗い余白を縁の外へ追い出す */
+  image-rendering: auto;
+}
+
+.character .name {
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.character .status {
+  margin-top: 6px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.character.present .status strong {
+  color: var(--olive);
+  text-transform: lowercase;
+}
+
+.hp {
+  margin-top: 10px;
+  display: grid;
+  gap: 4px;
+}
+
+.hp__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hp__pct {
+  color: var(--ink);
+  letter-spacing: 0.08em;
+}
+
+.hp__bar-wrap {
+  height: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+}
+
+.hp__bar {
+  height: 100%;
+  transition: width 0.6s ease, background 0.3s ease;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.character.absent .hp__bar {
+  /* 不在中は薄く脈打つアニメーションで「回復中」を示す */
+  animation: hp-recover-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hp-recover-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* ============================================================
+   Manual checkin row
+   ============================================================ */
+
+.manual-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.manual-row .spacer {
+  flex: 1;
+}
+
+.manual-row small {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--olive);
+}
+
+/* Roster ヘッダー右上に置く手動設定のコンパクト表示 */
+.manual-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manual-inline__state {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+/* 在室判定中は緑、退室中は琥珀色の状態ドット */
+.manual-inline__state::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--olive);
+  box-shadow: 0 0 6px rgba(194, 207, 58, 0.6);
+}
+
+.manual-inline__state.is-off {
+  color: var(--amber);
+}
+.manual-inline__state.is-off::before {
+  background: var(--amber);
+  box-shadow: 0 0 6px rgba(240, 136, 62, 0.6);
+}
+
+/* 不在（在室判定はONだが今は在室していない）はドットを消灯色に */
+.manual-inline__state.is-away::before {
+  background: var(--muted-2);
+  box-shadow: none;
+}
+
+.manual-inline__btn {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+/* 退室中は「在室を再開」を目立たせる */
+.manual-inline__btn.is-resume {
+  background: var(--olive);
+  color: #0a0d12;
+  border-color: var(--olive);
+  font-weight: 700;
+}
+.manual-inline__btn.is-resume:hover:not(:disabled) {
+  background: var(--olive-deep);
+  border-color: var(--olive-deep);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.muted {
+  color: var(--muted);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@keyframes boot {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.terminal,
+.ops-bar,
+.card {
+  animation: boot 0.6s ease both;
+}
+
+.card:nth-child(2) { animation-delay: 0.08s; }
+.card:nth-child(3) { animation-delay: 0.16s; }
+
+/* ============================================================
+   Tab navigation (ホーム / ランキング)
+   ============================================================ */
+
+.nav-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
+.nav-tabs button {
+  border: 0;
+  border-right: 1px solid var(--border);
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+}
+
+.nav-tabs button:last-child {
+  border-right: 0;
+}
+
+.nav-tabs button.active {
+  background: var(--olive);
+  color: #0a0d12;
+  font-weight: 700;
+}
+
+/* ============================================================
+   Ranking
+   ============================================================ */
+
+.ranking-tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+}
+
+.ranking-tabs button {
+  border: 0;
+  border-right: 1px solid var(--border);
+  padding: 7px 14px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+
+.ranking-tabs button:last-child {
+  border-right: 0;
+}
+
+.ranking-tabs button.active {
+  background: var(--olive);
+  color: #0a0d12;
+  font-weight: 700;
+}
+
+/* DFT 周期解析トグル */
+.dft-toggle {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 5px 9px;
+  white-space: nowrap;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--muted);
+}
+.dft-toggle.active {
+  background: rgba(88, 166, 255, 0.14);
+  border-color: #58a6ff;
+  color: #58a6ff;
+}
+.dft-note {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  align-self: center;
+}
+.dft-caption {
+  margin: 12px 4px 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.dft-caption strong {
+  color: #f0883e;
+}
+
+/* スマホ: グラフ上のユーザー名凡例（縦並び） */
+.chart-legend {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0 4px 10px;
+  font-size: 12px;
+}
+.chart-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+.chart-legend__dot {
+  width: 12px;
+  height: 3px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.ranking-list {
+  display: grid;
+  gap: 10px;
+}
+
+.ranking-row {
+  display: grid;
+  /* minmax(0,..) にしないと、中身（長い名前）より縮まず行が画面外へはみ出す。
+     最後の時刻列は固定幅にしないと「15h 34m」「0m」など文字数差でバーの長さがズレるため固定。 */
+  grid-template-columns: 36px 40px minmax(0, 1fr) minmax(0, 2fr) 72px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s ease;
+}
+
+.ranking-row:hover {
+  border-color: var(--border-strong);
+}
+
+.ranking-row__rank {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 18px;
+  text-align: center;
+}
+
+.ranking-row__avatar {
+  font-size: 28px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ランキング行の枠（40px 列）に収まるサイズ。縦長キャラの比率に合わせて高さは少し大きめ */
+.ranking-row__avatar-png {
+  width: 32px;
+  height: 44px;
+  object-fit: contain;
+  display: block;
+}
+
+.ranking-row__name {
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  /* 長い名前は省略（…）してはみ出しを防ぐ */
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-row__bar-wrap {
+  height: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.ranking-row__bar {
+  height: 100%;
+  background: var(--olive);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 8px rgba(194, 207, 58, 0.4);
+}
+
+.ranking-row--me {
+  background: rgba(194, 207, 58, 0.08);
+  border-color: var(--olive-deep);
+  box-shadow: 0 0 0 1px rgba(194, 207, 58, 0.25), 0 0 12px rgba(194, 207, 58, 0.18);
+}
+
+.ranking-row__me-tag {
+  margin-left: 8px;
+  padding: 2px 6px;
+  background: var(--olive);
+  color: #0a0d12;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  vertical-align: middle;
+}
+
+.ranking-row__time {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--olive);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   Logs page
+   ============================================================ */
+
+.user-picker {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.user-picker__label {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 6px;
+}
+
+.user-picker__selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.user-picker__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.user-picker__avatar-png {
+  width: 18px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+}
+
+.user-picker__avatar-emoji {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.user-picker__remove {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0 6px;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.user-picker__remove:hover {
+  color: var(--crimson);
+  background: transparent;
+}
+
+.user-picker__toggle {
+  padding: 8px 16px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+
+.user-picker__dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 10;
+  width: 260px;
+  max-width: calc(100vw - 28px);
+  margin-top: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.user-picker__search {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-2);
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.user-picker__search:focus {
+  border-color: var(--olive);
+  box-shadow: none;
+}
+
+.user-picker__list {
+  list-style: none;
+  padding: 4px 0;
+  margin: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.user-picker__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.user-picker__row:hover {
+  background: var(--surface-2);
+}
+
+.user-picker__row input[type="checkbox"] {
+  accent-color: var(--olive);
+}
+
+.chart-wrap {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  padding: 16px 8px 8px;
+}
+
+/* グラフをタップ/クリックすると recharts の svg やラッパーにフォーカスが当たり、
+   ブラウザ標準の青いフォーカス枠が svg の輪郭に沿って出る。プロットの見た目とズレて
+   見えるだけの不要な装飾なので消す。 */
+.chart-wrap .recharts-wrapper:focus,
+.chart-wrap .recharts-wrapper:focus-visible,
+.chart-wrap .recharts-surface:focus,
+.chart-wrap .recharts-surface:focus-visible,
+.chart-wrap svg:focus,
+.chart-wrap svg:focus-visible {
+  outline: none;
+}
+
+.log-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.log-filter {
+  display: grid;
+  gap: 4px;
+}
+
+.log-filter > span {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.log-filter select,
+.log-filter input[type="date"] {
+  font: inherit;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  padding: 8px 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-2);
+  color: var(--ink);
+  outline: none;
+  font-size: 12px;
+  color-scheme: dark;
+}
+
+.log-filter select:focus,
+.log-filter input[type="date"]:focus {
+  border-color: var(--olive);
+}
+
+.log-list {
+  display: grid;
+  gap: 6px;
+}
+
+.log-filter--toggle {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.log-filter--toggle input[type="checkbox"] {
+  accent-color: var(--olive);
+}
+
+.log-list--scroll {
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.log-list__more {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 4px;
+}
+
+.log-list__more button {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+
+.log-list--scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.log-list--scroll::-webkit-scrollbar-track {
+  background: var(--bg-2);
+}
+
+.log-list--scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+
+.log-list--scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--olive-deep);
+}
+
+.log-row {
+  display: grid;
+  /* minmax(0,1fr) で名前列が縮めるようにし、はみ出しを防ぐ */
+  grid-template-columns: 32px 100px minmax(0, 1fr) 80px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  transition: border-color 0.2s ease;
+}
+
+.log-row:hover {
+  border-color: var(--border-strong);
+}
+
+.log-row__avatar {
+  font-size: 22px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ログ行（32px 列）に収まる小さい PNG */
+.log-row__avatar-png {
+  width: 26px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
+}
+
+/* 管理者の場合は末尾に削除列を追加 */
+.log-row--admin {
+  grid-template-columns: 32px 100px 1fr 80px 64px;
+}
+
+.log-row__delete {
+  padding: 6px 8px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+/* 管理者用ログ追加フォーム */
+.log-add-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border: 1px dashed var(--border-strong);
+}
+
+.log-add-form__error {
+  flex: 1 1 100%;
+  margin: 0;
+}
+
+.log-add-form input[type="datetime-local"] {
+  font: inherit;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  padding: 8px 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-2);
+  color: var(--ink);
+  outline: none;
+  font-size: 12px;
+  color-scheme: dark;
+}
+
+.log-add-form input[type="datetime-local"]:focus {
+  border-color: var(--olive);
+}
+
+.log-row__name {
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.06em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-row__time {
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.log-row__duration {
+  color: var(--olive);
+  text-align: right;
+  letter-spacing: 0.06em;
+}
+
+/* ============================================================
+   Modal (キャラ変更など)
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(5, 8, 12, 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--border-strong);
+}
+
+.modal__head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal__head h2 {
+  margin: 0;
+  flex: 1;
+  font-family: "Big Shoulders Stencil Display", "Noto Sans JP", sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.modal__close {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  padding: 2px 8px;
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ============================================================
+   Header hamburger menu
+   ============================================================ */
+
+.header-menu {
+  position: relative;
+}
+
+.header-menu__toggle {
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-menu__bars {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 18px;
+  height: 14px;
+}
+
+.header-menu__bars span {
+  display: block;
+  height: 2px;
+  background: currentColor;
+}
+
+.header-menu__dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.header-menu__dropdown button {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  padding: 12px 14px;
+  text-align: left;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.header-menu__dropdown button:last-child {
+  border-bottom: 0;
+}
+
+.header-menu__dropdown button:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.header-menu__dropdown button.header-menu__danger {
+  color: var(--crimson);
+}
+
+.header-menu__dropdown button.header-menu__danger:hover:not(:disabled) {
+  background: rgba(248, 81, 73, 0.12);
+}
+
+/* ============================================================
+   Danger button / admin badge
+   ============================================================ */
+
+button.danger,
+.btn.danger {
+  border-color: rgba(248, 81, 73, 0.6);
+  color: var(--crimson);
+  background: transparent;
+}
+
+button.danger:hover:not(:disabled) {
+  background: rgba(248, 81, 73, 0.12);
+  border-color: var(--crimson);
+}
+
+button.primary.danger {
+  background: var(--crimson);
+  color: #0a0d12;
+  border-color: var(--crimson);
+}
+
+button.primary.danger:hover:not(:disabled) {
+  background: #d63a33;
+  border-color: #d63a33;
+}
+
+.admin-tag {
+  padding: 2px 6px;
+  background: var(--amber);
+  color: #0a0d12;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+/* ============================================================
+   Admin console
+   ============================================================ */
+
+.admin-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.admin-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s ease;
+}
+
+.admin-row:hover {
+  border-color: var(--border-strong);
+}
+
+.admin-row__info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.admin-row__name {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.admin-row__sub {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--muted-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-row__badge {
+  padding: 2px 6px;
+  background: var(--amber);
+  color: #0a0d12;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.admin-row__badge--me {
+  background: var(--olive);
+}
+
+.admin-row__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-row__actions button {
+  font-size: 11px;
+  padding: 6px 10px;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 640px) {
+  .admin-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-row__actions {
+    justify-content: flex-end;
+  }
+}
+
+/* ============================================================
+   Mobile
+   ============================================================ */
+
+@media (max-width: 640px) {
+  #root {
+    padding: 20px 14px 48px;
+  }
+
+  .ops-bar {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .ops-bar__user {
+    justify-self: start;
+  }
+
+  .terminal {
+    margin-top: 32px;
+    padding: 24px;
+  }
+
+  .terminal__title {
+    font-size: 30px;
+  }
+
+  /* スマホは画面幅に対して文字が大きく、グラフなどの中身が相対的に小さく見えるので、
+     見出し・カウント・ボタン類を一回り小さくしてバランスを取る。 */
+  .ops-bar__title {
+    font-size: 26px;
+  }
+  .ops-bar__sub {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+  .card__head h2 {
+    font-size: 17px;
+  }
+  .card__head .count {
+    font-size: 10px;
+  }
+  .card__head .count strong {
+    font-size: 14px;
+  }
+  button,
+  .btn {
+    font-size: 11px;
+    padding: 8px 14px;
+  }
+
+  /* スマホ: カードヘッダーを折り返し可能にして、タイトルとボタンは同じ行に並べる */
+  .card__head {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card__head .spacer {
+    display: none;
+  }
+
+  /* タイトルは残り幅を使い、トグルボタンと同じ行に並ぶ */
+  .card__head h2 {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* タブ/注記は次の行へ送る（フル幅） */
+  .ranking-tabs,
+  .dft-note {
+    flex: 1 1 100%;
+    margin-top: 12px;
+  }
+
+  .ranking-tabs button {
+    flex: 1;
+    text-align: center;
+  }
+
+  /* スマホではボタンをさらに小さく */
+  .dft-toggle {
+    padding: 4px 8px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ヘッダーメニューはスマホだと画面左寄りに出るので、右ではなく左基準で開く
+     （右基準だと min-width 分だけ画面左にはみ出して文字が切れる） */
+  .header-menu__dropdown {
+    right: auto;
+    left: 0;
+    min-width: 180px;
+    max-width: calc(100vw - 28px);
+  }
+
+  /* 在室メンバー: スマホは横幅が狭く1列になりがちなので、明示的に2列にする */
+  .character-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* ランキング行: スマホは固定列・余白・文字を詰めて収める。
+     時刻列はバーが揃うよう固定幅にする。 */
+  .ranking-row {
+    grid-template-columns: 28px 30px minmax(0, 1.3fr) minmax(0, 1fr) 52px;
+    gap: 8px;
+    padding: 10px 10px;
+  }
+  .ranking-row__rank {
+    font-size: 14px;
+  }
+  /* スマホは省略（…）せず2行に折り返して名前を全部見せる */
+  .ranking-row__name {
+    font-size: 13px;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+  .ranking-row__time {
+    font-size: 11px;
+  }
+
+  /* 比較対象ピッカー: スマホは縦積みにして「選択」ボタンとユーザー表示の重なりを防ぐ。
+     グラフ周りのUIはスマホだと大きすぎてグラフが小さく見えるので、全体的に一回り小さくする。 */
+  .user-picker {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .user-picker__label {
+    margin-right: 0;
+    font-size: 10px;
+  }
+  /* 選択済みユーザーは折り返さず、横幅に収まらなくなったらこのボックスだけ横スクロール。
+     width/max-width を固定しないと中身に合わせて伸び、スクロールせず画面ごとはみ出してしまう。 */
+  .user-picker__selected {
+    flex: 0 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: thin;
+  }
+  .user-picker__pill {
+    flex: 0 0 auto;
+    padding: 3px 3px 3px 6px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .user-picker__avatar-png {
+    width: 15px;
+    height: 20px;
+  }
+  .user-picker__toggle {
+    align-self: flex-start;
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  /* グラフ上部のタブ・凡例もスマホでは小さめに */
+  .ranking-tabs button {
+    font-size: 10px;
+    padding: 7px 8px;
+  }
+  .chart-legend__item {
+    font-size: 11px;
+  }
+
+  /* ログ行: スマホは横1列に詰め込むと時刻が折り返して崩れるので、
+     アバターを左に置き、名前（上）と入退室時刻（下）を2行に積む。 */
+  .log-row {
+    grid-template-columns: 26px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "avatar name     duration"
+      "avatar time     time";
+    column-gap: 8px;
+    row-gap: 2px;
+    align-items: center;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  .log-row--admin {
+    grid-template-columns: 26px minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "avatar name duration delete"
+      "avatar time time     time";
+  }
+  .log-row__avatar {
+    grid-area: avatar;
+    align-self: center;
+  }
+  /* 名前は省略せず最大2行で全部見せる */
+  .log-row__name {
+    grid-area: name;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.2;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  /* 入退室時刻は1行に収める（折り返さない） */
+  .log-row__time {
+    grid-area: time;
+    white-space: nowrap;
+    font-size: 10px;
+  }
+  .log-row__duration {
+    grid-area: duration;
+  }
+  .log-row__delete {
+    grid-area: delete;
+    align-self: center;
+  }
+
+  /* 比較セレクタのドロップダウン: スマホはインライン展開だと画面全体が動いて疲れるので、
+     絶対配置の小さめの浮動ボックスにして、空間をあまり圧迫しないようにする。 */
+  .user-picker__dropdown {
+    position: absolute;
+    right: auto;
+    left: 0;
+    width: 200px;
+    margin-top: 6px;
+  }
+  .user-picker__search {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  .user-picker__list {
+    max-height: 160px;
+  }
+  .user-picker__row {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  /* やることリストの登録フォームは縦並びに */
+  .todo-form > input[type="text"],
+  .todo-form .todo-picker,
+  .todo-form .todo-due,
+  .todo-form .todo-picker__toggle {
+    flex: 1 1 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   To Do list（やることリスト）
+   ============================================================ */
+
+.todo-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.todo-form > input[type="text"] {
+  flex: 1 1 220px;
+  min-width: 0;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 13px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-2);
+  color: var(--ink);
+  outline: none;
+}
+
+.todo-form input[type="date"],
+.todo-form input[type="datetime-local"] {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 13px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-2);
+  color: var(--ink);
+  outline: none;
+}
+
+.todo-form input[type="date"]:focus,
+.todo-form input[type="datetime-local"]:focus {
+  border-color: var(--olive);
+  box-shadow: 0 0 0 3px rgba(194, 207, 58, 0.18);
+}
+
+/* 担当者を複数選択するドロップダウン */
+.todo-picker {
+  position: relative;
+  /* inline-block ボタンを直接入れると行ボックスの余白分だけ箱が高くなり、
+     top:100% のドロップダウンがボタンの下に隙間を空けて出てしまう。
+     flex にして箱の高さをボタンぴったりにし、ドロップダウンをボタン直下に出す。 */
+  display: flex;
+}
+
+.todo-picker__toggle {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  padding: 10px 14px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-picker__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  width: 220px;
+  max-width: calc(100vw - 28px);
+  margin-top: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.todo-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  /* 全員＋メンバー数が多いとカードの下までドロップダウンが伸びてしまうので、
+     高さを抑えて、はみ出す分はこのリスト内でスクロールさせる。 */
+  max-height: 168px;
+  overflow-y: auto;
+}
+
+.todo-picker__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.todo-picker__row:hover {
+  background: var(--bg-2);
+}
+
+.todo-picker__row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--olive);
+}
+
+/* 期限入力（日付＋時刻トグル） */
+.todo-due {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.todo-due__time-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.todo-due__time-toggle input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--olive);
+}
+
+/* 完了取り消しバナー */
+.todo-undo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border: 1px solid var(--olive);
+  background: rgba(194, 207, 58, 0.1);
+  font-size: 13px;
+}
+
+.todo-undo span {
+  flex: 1;
+  min-width: 0;
+}
+
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-list--done {
+  margin-top: 10px;
+}
+
+.todo-empty {
+  padding: 14px;
+  text-align: center;
+  border: 1px dashed var(--border);
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+}
+
+.todo-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--olive);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.todo-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.todo-title {
+  font-size: 14px;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.todo-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.todo-chip {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.todo-item--done .todo-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+/* タスク行の操作ボタン群。デスクトップは横並び表示、モバイルはケバブメニューに集約。 */
+.todo-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ケバブ(⋮)メニュー。デスクトップでは非表示（横並びボタンを使う）。 */
+.todo-item__menu {
+  display: none;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.todo-item__menu-toggle {
+  padding: 4px 10px;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.todo-item__menu-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  min-width: 120px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.todo-item__menu-dropdown button {
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  padding: 12px 16px;
+  text-align: left;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.todo-item__menu-dropdown button:last-child {
+  border-bottom: 0;
+}
+
+.todo-item__menu-dropdown button:hover:not(:disabled) {
+  background: var(--surface-2);
+}
+
+.todo-item__menu-dropdown button.todo-item__menu-danger {
+  color: var(--crimson);
+}
+
+.todo-item__menu-dropdown button.todo-item__menu-danger:hover:not(:disabled) {
+  background: rgba(248, 81, 73, 0.12);
+}
+
+/* タスク行: 画面が狭くなると横並びの編集/削除がタイトルや担当者を圧迫するので、
+   早めに（640px より手前で）右上のケバブメニューへ集約する。
+   ※基本ルール(.todo-actions / .todo-item__menu)の後ろに置かないと後勝ちで効かないので注意。 */
+@media (max-width: 768px) {
+  .todo-actions {
+    display: none;
+  }
+  .todo-item__menu {
+    display: block;
+    align-self: flex-start;
+  }
+}
+
+.todo-item--editing {
+  display: block;
+}
+
+.todo-item--editing .todo-form {
+  margin-bottom: 0;
+}
+
+.todo-done-toggle {
+  margin-top: 14px;
+  width: 100%;
+  text-align: left;
+}
